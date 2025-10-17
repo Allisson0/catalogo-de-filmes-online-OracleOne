@@ -1,19 +1,22 @@
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args){
-        int anoDeLancamento = 2022;
-        boolean incluidoNoPlano = true;
-        double notaDoFilme = 9.2;
-        String tipoPlano = "plus";
+        Scanner leitura = new Scanner(System.in);
 
-        if (anoDeLancamento >= 2022){
-            System.out.println("Lançamento que os clientes estão curtindo.");
-        } else {
-            System.out.println("Filme retrô que vale a pena assistir!");
-        }
+        System.out.println("Digite  seu filme favorito: ");
 
-        if (incluidoNoPlano || tipoPlano.equals("plus")){
-            
-        }
+        String filme = leitura.nextLine();
+
+        System.out.println("Qual o ano de lançamento: ");
+
+        int anoDeLancamento = leitura.nextInt();
+
+        System.out.println("Insira sua avaliação: ");
+
+        double avaliacao = leitura.nextDouble();
+
+        System.out.println(String.format("Filme: %s \nAno de lançamento: %d\nAvaliacao: %.2f", filme, anoDeLancamento, avaliacao));
 
     }
 }
