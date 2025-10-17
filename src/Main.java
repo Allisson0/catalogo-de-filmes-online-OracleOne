@@ -4,19 +4,30 @@ public class Main {
     public static void main(String[] args){
         Scanner leitura = new Scanner(System.in);
 
-        System.out.println("Digite  seu filme favorito: ");
+       double mediaAvaliacao = 0;
+       double nota = 0;
+       int totalDeNotas = 0;
 
-        String filme = leitura.nextLine();
+        // for (int i = 0; i < 3; i++){
+        //     System.out.println("Diga sua avaliação para o filme: ");
 
-        System.out.println("Qual o ano de lançamento: ");
+        //     nota = leitura.nextDouble();
 
-        int anoDeLancamento = leitura.nextInt();
+        //     mediaAvaliacao += nota;
 
-        System.out.println("Insira sua avaliação: ");
+        //     totalDeNotas++;
+        // }
 
-        double avaliacao = leitura.nextDouble();
+        while (nota != -1) {
+            System.out.println("Diga sua avaliação para o filme ou -1 para encerrar.");
+            nota = leitura.nextDouble();
 
-        System.out.println(String.format("Filme: %s \nAno de lançamento: %d\nAvaliacao: %.2f", filme, anoDeLancamento, avaliacao));
-
+            if (nota != -1) {
+                mediaAvaliacao+=nota;
+                totalDeNotas++;
+            }
+        }
+        
+        System.out.println(String.format("Média das avaliações: %.2f", mediaAvaliacao/totalDeNotas));
     }
 }
