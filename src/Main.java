@@ -2,32 +2,84 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args){
-        Scanner leitura = new Scanner(System.in);
 
-       double mediaAvaliacao = 0;
-       double nota = 0;
-       int totalDeNotas = 0;
+        //Inicialização das variaveis:
+        Scanner input = new Scanner(System.in);
 
-        // for (int i = 0; i < 3; i++){
-        //     System.out.println("Diga sua avaliação para o filme: ");
+        String nome = "Allisson Silva";
+        String tipoDeConta = "Corrente";
+        double saldoAtual = 759.5;
 
-        //     nota = leitura.nextDouble();
+        int escolha = 0;
 
-        //     mediaAvaliacao += nota;
+        double valor = 0.0;
 
-        //     totalDeNotas++;
-        // }
+        String extratoInicial ="""
+                ****************************************
+                Dados iniciais do cliente: 
 
-        while (nota != -1) {
-            System.out.println("Diga sua avaliação para o filme ou -1 para encerrar.");
-            nota = leitura.nextDouble();
+                Nome:\t\t\t %s
+                Tipo conta:\t\t %s
+                Saldo inicial:\t\t %.2f 
+                ****************************************
+                """.formatted(nome, tipoDeConta, saldoAtual);
 
-            if (nota != -1) {
-                mediaAvaliacao+=nota;
-                totalDeNotas++;
+        String operacoes = """
+                    
+                Operações:
+
+                1 - Consultar saldo
+                2 - Receber valor
+                3 - Transferir valor
+                4 - Sair
+
+                Digite a opção desejada: """;
+
+
+        //Abertura do programa
+
+        System.out.println(extratoInicial);
+
+        while (escolha != 4) {
+            
+            System.out.println(operacoes);
+            escolha = input.nextInt();
+
+            switch (escolha) {
+
+                case 1:
+                    System.out.println(String.format("Saldo atual: %.2f", saldoAtual));
+                    break;
+
+                case 2:
+                    System.out.println("Insira o valor a ser recebido: ");
+                    valor = input.nextDouble();
+                    saldoAtual+=valor;
+                    System.out.println("Valor recebido com sucesso! ");
+                    System.out.println(String.format("Saldo atualizado: %.2f", saldoAtual));
+                    break;
+
+                case 3:
+                    System.out.println("Insira o valor a ser transferido: ");
+                    valor = input.nextDouble();
+
+                    if (valor <= saldoAtual) {
+                        saldoAtual-=valor;
+                        System.out.println("Valor transferido com sucesso! ");
+                        System.out.println(String.format("Saldo atualizado: %.2f", saldoAtual));
+                    } else{
+                        System.out.println("Valor superior ao saldo atual. ");
+                    }
+                    break;
+
+                case 4:
+                    System.out.println("Saindo... ");
+                    break;
+
+                default:
+                    System.out.println("Opção inválida.");
+                    break;
             }
         }
-        
-        System.out.println(String.format("Média das avaliações: %.2f", mediaAvaliacao/totalDeNotas));
     }
 }
