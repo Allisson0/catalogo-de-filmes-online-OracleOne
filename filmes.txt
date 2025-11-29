@@ -1,0 +1,1 @@
+Nome= 'Alien', ano de Lançamento= 1979, duração: 11
