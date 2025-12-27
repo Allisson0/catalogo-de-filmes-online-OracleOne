@@ -6,22 +6,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 
+//Define que a classe é uma entidade do banco de dados
+//Define que é uma tabela com nome series
 @Entity
 @Table(name = "series")
 public class Serie {
+    //Define uma chave primária com valor incremental
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    //Define que é único
     @Column(unique = true)
     private String titulo;
     private Integer totalTemporadas;
     private Double avaliacao;
+    //Define um tipo enumerado ordenado por STRING
     @Enumerated(EnumType.STRING)
     private Categoria genero;
     private String atores;
     private String poster;
     private String sinopse;
-    @Transient
+
+    //@Transient
+    //Transient ignora a variável na criação da relação ao banco de dados
+    //Declaramos que é um relacionamento um para muitos de série para episódios
+    @OneToMany(mappedBy = "serie")
     private List<Episodio> episodios = new ArrayList<>();
 
     public Serie(){}
