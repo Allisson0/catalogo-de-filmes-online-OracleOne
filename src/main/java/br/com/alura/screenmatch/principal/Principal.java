@@ -6,6 +6,7 @@ import br.com.alura.screenmatch.service.ConsumoApi;
 import br.com.alura.screenmatch.service.ConverteDados;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Principal {
 
@@ -17,6 +18,8 @@ public class Principal {
     private List<DadosSerie> dadosSeries = new ArrayList<>();
 
     private SerieRepository repositorio;
+
+    private List<Serie> series = new ArrayList<>();
 
     public Principal (SerieRepository repositorio){
         this.repositorio = repositorio;
@@ -44,7 +47,7 @@ public class Principal {
                     buscarSerieWeb();
                     break;
                 case 2:
-                    buscarEpisodiosSerie();
+                    EpisodiosDaSerie();
                     break;
                 case 3:
                     listarSerieBuscadas();
@@ -76,44 +79,63 @@ public class Principal {
         return conversor.obterDados(request, DadosSerie.class);
     }
 
-    //========== BUSCA OS EPISÓDIOS DA SÉRIE ==========
-    private void buscarEpisodiosSerie(){
-        List<DadosTemporada> dadosTemporada = getEpisodiosSerie();
-        dadosTemporada.forEach(System.out::println);
-    }
-
     //============ REALIZA A BUSCA DOS EPISÓDIOS DA SÉRIE NA WEB =================
-    private List<DadosTemporada> getEpisodiosSerie(){
-        System.out.println("Digite o nome da série para buscar: ");
-        var choose = input.nextLine();
-        String address = ENDERECO + choose.replace(" ", "+") + API_KEY;
-        //Busca o resultado da API
-        var json = consumoApi.obterDados(address);
-        //Converte em um tipo de serie
-        DadosSerie serie = conversor.obterDados(json, DadosSerie.class);
+    private void EpisodiosDaSerie(){
 
-        //Cria uma lista para armazenar as temporadas
-        List<DadosTemporada> temporadas = new ArrayList<>();
+        listarSerieBuscadas();
+        System.out.println("Escolha uma série pelo nome: ");
+        var nomeSerie = input.nextLine();
 
-        //Para cada temporada, guarda as informações na lista das temporadas da série
-        for (int i = 1; i <= serie.totalTemporadas(); i++){
-            address = ENDERECO + choose.replace(" ", "+") + "&season=" + i + API_KEY;
-            json = consumoApi.obterDados(address);
-            //Para cada temporada encontrada, transforma na classe dadosTemporada
-            DadosTemporada dadosTemporada = conversor.obterDados(json, DadosTemporada.class);
-            //Adiciona a temporada na lista de temporadas
-            temporadas.add(dadosTemporada);
+        //Procura a série buscada no nosso banco de dados
+        Optional<Serie> serie = series.stream()
+                .filter(s -> s.getTitulo().toLowerCase().contains(nomeSerie.toLowerCase()))
+                .findFirst();
+
+        //Verifica se a série foi encontrada no banco de dados
+        if (serie.isPresent()) {
+
+            var serieEncontrada = serie.get();
+            //Cria uma lista para armazenar as temporadas
+            List<DadosTemporada> temporadas = new ArrayList<>();
+
+            //Para cada temporada, guarda as informações na lista das temporadas da série
+            for (int i = 1; i <= serieEncontrada.getTotalTemporadas(); i++) {
+                var address = ENDERECO + serieEncontrada.getTitulo().replace(" ", "+") + "&season=" + i + API_KEY;
+                var json = consumoApi.obterDados(address);
+                //Para cada temporada encontrada, transforma na classe dadosTemporada
+                DadosTemporada dadosTemporada = conversor.obterDados(json, DadosTemporada.class);
+                //Adiciona a temporada na lista de temporadas
+                temporadas.add(dadosTemporada);
+            }
+
+            //Retorna a lista de temporadas
+            temporadas.forEach(System.out::println);
+
+            //Para cada episódio das temporadas, trabalharemos no episódio e criaremos uma
+            //instância de episódios, passando o número da temporada do episódio e o episódio
+            //para a lista de episódios.
+            List<Episodio> episodios = temporadas.stream()
+                    .flatMap(t -> t.episodios().stream()
+                            //t.numero() é o número da temporada e 'e' é a instância do record
+                            //DadosEpisodio
+                            .map(e -> new Episodio(t.numero(), e)))
+                    .collect(Collectors.toList());
+
+            //Para nossa lista de serieEncontrada, passamos então ela para o nosso banco
+            //de dados. Assim, ele passará também os episódios da série.
+            serieEncontrada.setEpisodios(episodios);
+
+            //Salva no banco de dados as informações da série que foi encontrada
+            //do banco de dados
+            repositorio.save(serieEncontrada);
+        } else{
+            System.out.println("Série não encontrada.");
         }
-
-        //Retorna a lista de temporadas
-        return temporadas;
     }
 
     //========= IMPRIME AS SÉRIES BUSCADAS =========
     private void listarSerieBuscadas(){
-
-        List<Serie> series = repositorio.findAll();
-
+        series = repositorio.findAll();
         series.stream()
                 .sorted(Comparator.comparing(Serie::getGenero))
                 .forEach(System.out::println);
